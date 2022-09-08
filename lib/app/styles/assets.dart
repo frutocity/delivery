@@ -1,0 +1,11 @@
+const appLogo = "assets/icons/logo.png";
+const googleLogo = "assets/icons/google.png";
+const rotatingTomato = "assets/icons/Tomato animated.gif";
+const searchIcon = "assets/icons/search_icon.svg";
+const personIcon = "assets/icons/account_icons/personIcon.svg";
+const mailIcon = "assets/icons/account_icons/mailIcon.svg";
+const telephonrIcon = "assets/icons/account_icons/telephonrIcon.svg";
+const delivery_icon = "assets/icons/account_icons/delivery_icon.svg";
+const editicon = "assets/icons/account_icons/editicon.png";
+const empty_cart = "assets/icons/empty_cart.png";
+const no_user_image = "assets/icons/no_user_image.jpg";
