@@ -1,3 +1,4 @@
+import 'package:app/app/modules/providers/authProvider.dart';
 import 'package:app/app/styles/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -26,4 +27,5 @@ void main() {
 
 void initGetStorage() async {
   await GetStorage.init();
+  AuthProvider().updateStatus(status: "on", onError: (e) {}, onSuccess: () {});
 }

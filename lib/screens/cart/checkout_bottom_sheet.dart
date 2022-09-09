@@ -11,6 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CheckoutBottomSheet extends StatefulWidget {
+  dynamic? data;
+
+  CheckoutBottomSheet({this.data});
   @override
   _CheckoutBottomSheetState createState() => _CheckoutBottomSheetState();
 }
@@ -37,7 +40,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
             Row(
               children: [
                 AppText(
-                  text: "Checkout",
+                  text: "New Order Received",
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
                 ),
@@ -56,34 +59,35 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
               height: 45,
             ),
             getDivider(),
-            checkoutRow("Delivery",
-                trailingText: _addressContoller.selectedAdrs?.apartment ??
-                    "Select Address", click: () {
-              showBottomSheet(context);
-            }),
-            getDivider(),
-            checkoutRow("Total Cost",
-                trailingText: "$rupees ${_cartController.totalCartAmount()}"),
-            getDivider(),
             SizedBox(
               height: 30,
             ),
             termsAndConditionsAgreement(context),
-            Container(
-              margin: EdgeInsets.only(
-                top: 25,
+            ListTile(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Expanded(
+                      child: RaisedButton(
+                    onPressed: () {},
+                    child: Text("Reject"),
+                    color: Colors.red,
+                    textColor: Colors.white,
+                  )),
+                  SizedBox(width: 18),
+                  Expanded(
+                      child: RaisedButton(
+                    onPressed: () {
+                      _authController.Socket()
+                          .emit('join-user-order', widget.data);
+                    },
+                    child: Text("Accept"),
+                    color: Colors.green,
+                    textColor: Colors.white,
+                  )),
+                ],
               ),
-              child: AppButton(
-                label: "Place Order",
-                fontWeight: FontWeight.w600,
-                padding: EdgeInsets.symmetric(
-                  vertical: 25,
-                ),
-                onPressed: () {
-                  onPlaceOrderClicked();
-                },
-              ),
-            ),
+            )
           ],
         ),
       );
@@ -100,7 +104,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
   Widget termsAndConditionsAgreement(BuildContext context) {
     return RichText(
       text: TextSpan(
-          text: 'By placing an order you agree to our',
+          text: 'By Accepting an order you agree to our',
           style: TextStyle(
             color: Color(0xFF7C7C7C),
             fontSize: 14,

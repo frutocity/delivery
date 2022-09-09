@@ -60,7 +60,8 @@ class AuthController extends GetxController {
           isVerified = true;
 
           setData("user", data.data);
-          socket?.emit('set-user', {"id":data.data.id});
+          setData("user-id", data.data.id.toString());
+
           setData("token", data.data.token);
           print("verify data success");
 
@@ -94,20 +95,24 @@ class AuthController extends GetxController {
     update();
   }
 
- void connectsocket() {
+  IO.Socket Socket() {
+    if (socket != null) {
+      return socket!;
+    }
     socket = IO.io('https://socket.frutocity.com/', <String, dynamic>{
       'transports': ['websocket'],
       'extraHeaders': {'foo': 'bar'}
     });
     socket?.connect();
-      socket?.onConnect((_) {
-    print('connect');
-    socket?.emit('msg', 'from flutter');
-  });
+    socket?.onConnect((_) {
+      print('connect');
+      socket?.emit('set-user', {"id": getData('user-id').toString()});
+    });
+    update();
+    return socket!;
     // socket?.onconnect((d){
     //   // print( "socket onconnect" + d.toString());
     // });
-    update();
   }
 
   void exclusiveOfferList() {

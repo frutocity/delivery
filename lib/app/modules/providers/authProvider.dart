@@ -94,4 +94,15 @@ class AuthProvider {
       onError: (error) => {if (onError != null) onError(error)},
     );
   }
+
+  void updateStatus({
+    required String status,
+    required Function()? onSuccess,
+    required Function(dynamic error)? onError,
+  }) {
+    ApiRequest(url: 'auth/employee/online?status=$status', data: null).get(
+      onSuccess: (data) {},
+      onError: (error) => {if (onError != null) onError(error)},
+    );
+  }
 }

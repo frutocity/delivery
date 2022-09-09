@@ -27,11 +27,10 @@ class _MobileVerificationState extends State<MobileVerification> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _authController.connectsocket();
+    _authController.Socket();
     _authController.socket?.on('msg', (data) {
       print('dataaa ' + data);
     });
-
   }
 
   getNumber() {

@@ -8,7 +8,7 @@
 PRODUCT_NAME = app
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.futocity.app
+PRODUCT_BUNDLE_IDENTIFIER = com.futocity.delivery
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2022 com.futocity. All rights reserved.

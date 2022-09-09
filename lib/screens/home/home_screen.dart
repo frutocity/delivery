@@ -5,6 +5,7 @@ import 'package:app/app/common_widgets/search_bar_widget.dart';
 import 'package:app/app/common_widgets/shimmerEffect.dart';
 import 'package:app/app/data/app_utils.dart';
 import 'package:app/app/helpers/storage.dart';
+import 'package:app/app/helpers/toast_service.dart';
 import 'package:app/app/models/ProductList.dart';
 import 'package:app/app/models/grocery_item.dart';
 import 'package:app/app/modules/controllers/auth_controller.dart';
@@ -14,6 +15,7 @@ import 'package:app/app/routes/app_pages.dart';
 import 'package:app/app/styles/colors.dart';
 import 'package:app/app/styles/theme.dart';
 import 'package:app/screens/address/select_address.dart';
+import 'package:app/screens/cart/checkout_bottom_sheet.dart';
 import 'package:app/screens/onboarding/WelcomeScreen.dart';
 import 'package:app/screens/product_details/product_details_screen.dart';
 import 'package:carousel_indicator/carousel_indicator.dart';
@@ -56,16 +58,17 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   void initState() {
     super.initState();
-    _categoryController.categoryList();
-    _authController.bannerList();
-    _authController.exclusiveOfferList();
-    _authController.bestSellingOfferList();
-    _authController.mostPopularList();
-    ("nckdecjewfic${getData('token')}");
+
+    print("nckdecjewfic${getData('token')}");
     getLoc();
-    _authController.socket?.on('new-order', (data) {
+    _authController.Socket().on('test-pong', (data) {
+      ToastService.show(data);
+    });
+    _authController.Socket().on('new-order', (data) {
+      ToastService.show("new order");
+      showBottomSheet(context, data);
       print("new order - ${data}");
-    }); 
+    });
   }
 
   dynamic handlePageChanged(int index, CarouselPageChangedReason reason) {
@@ -79,24 +82,21 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () async {
-   
-      },
+      onRefresh: () async {},
       child: GetBuilder<AuthController>(builder: (_context) {
         return Scaffold(
-          
-          
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-  elevation: 0,
-            title: AppText(text:"Arshad",),
+            elevation: 0,
+            title: AppText(
+              text: "Arshad",
+            ),
           ),
           body: SafeArea(
             child: Container(
-              child: Center(
-                child: Image.asset('assets/images/order_failed_image.png'),
-              )
-            ),
+                child: Center(
+              child: Image.asset('assets/images/order_failed_image.png'),
+            )),
           ),
         );
       }),
@@ -352,4 +352,18 @@ class _TaskScreenState extends State<TaskScreen> {
   //   List<Address> add = await localeIdentifier(coordinates);
   //   return add;
   // }
+
+  void showBottomSheet(context, data) {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: false,
+        isDismissible: false,
+        enableDrag: false,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext bc) {
+          return CheckoutBottomSheet(
+            data: data,
+          );
+        });
+  }
 }
