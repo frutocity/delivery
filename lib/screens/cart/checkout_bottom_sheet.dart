@@ -9,6 +9,8 @@ import 'package:app/app/modules/controllers/odercontroller.dart';
 import 'package:app/screens/address/selectAddressSheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class CheckoutBottomSheet extends StatefulWidget {
   dynamic? data;
@@ -80,6 +82,9 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                     onPressed: () {
                       _authController.Socket()
                           .emit('join-user-order', widget.data);
+                      _authController.getOrder(widget.data);
+                      MapUtils.openMap(
+                          double.parse("70.12546"), double.parse("72.12546"));
                     },
                     child: Text("Accept"),
                     color: Colors.green,
@@ -194,5 +199,19 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
         builder: (BuildContext bc) {
           return SelectAdrsSheet();
         });
+  }
+}
+
+class MapUtils {
+  MapUtils._();
+
+  static Future<void> openMap(double lat, double long) async {
+    String googleUrl =
+        'https://www.google.com/maps/search/?api=1&query=$lat,$long';
+    if (await canLaunchUrlString(googleUrl)) {
+      await launchUrlString(googleUrl);
+    } else {
+      throw 'Could not open the map.';
+    }
   }
 }

@@ -4,6 +4,7 @@ import 'package:app/app/data/app_utils.dart';
 import 'package:app/app/helpers/storage.dart';
 import 'package:app/app/helpers/toast_service.dart';
 import 'package:app/app/models/BannerList.dart';
+import 'package:app/app/models/NewOrderResponse.dart';
 import 'package:app/app/models/ProductList.dart';
 import 'package:app/app/models/post.dart';
 import 'package:app/app/modules/providers/authProvider.dart';
@@ -24,6 +25,7 @@ class AuthController extends GetxController {
   List<Product> mostPopulars = <Product>[].obs;
   List<Product> productdetail = <Product>[].obs;
   IO.Socket? socket;
+  Map<String, dynamic>? orderdata;
 
   @override
   void onInit() {
@@ -75,6 +77,14 @@ class AuthController extends GetxController {
 
           update();
         });
+  }
+
+  void getOrder(data) {
+    if (data != null) {
+      orderdata = data;
+    }
+
+    update();
   }
 
   void bannerList() {
