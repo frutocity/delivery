@@ -71,7 +71,12 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                 children: <Widget>[
                   Expanded(
                       child: RaisedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _authController.Socket().emit('reject-user-order', {
+                        "order": widget.data,
+                        "body": {"_id": "233"}
+                      });
+                    },
                     child: Text("Reject"),
                     color: Colors.red,
                     textColor: Colors.white,
@@ -83,8 +88,11 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                       _authController.Socket()
                           .emit('join-user-order', widget.data);
                       _authController.getOrder(widget.data);
-                      MapUtils.openMap(
-                          double.parse("70.12546"), double.parse("72.12546"));
+                      _authController.Socket().emit('accept-user-order', {
+                        "order": widget.data,
+                        "body": {"_id": "233"}
+                      });
+                      Get.back();
                     },
                     child: Text("Accept"),
                     color: Colors.green,
