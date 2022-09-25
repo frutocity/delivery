@@ -30,7 +30,7 @@ class AuthProvider {
         print(data);
         onSuccess(VerifyOtpReponse.fromJson(data));
       },
-      onError: (error) => {if (onError != null) onError(error)},
+      onError: (error) => {if (onError != null) onError(error.toString())},
     );
   }
 

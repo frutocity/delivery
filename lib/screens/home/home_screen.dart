@@ -31,6 +31,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import '../../app/models/NewOrderResponse.dart';
 import 'grocery_featured_Item_widget.dart';
 import 'home_banner_widget.dart';
@@ -55,7 +56,7 @@ class _TaskScreenState extends State<TaskScreen> {
   LocationData? _currentPosition;
   String? _address, _dateTime;
   int pageIndex = 0;
-  String orderStatus = "Order Picked";
+  String orderStatus = "null";
 
   CarouselController _carouselController = CarouselController();
   final AuthController _authController = Get.put(AuthController());
@@ -65,27 +66,40 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   void initState() {
     super.initState();
+    getLoc();
+    orderStatus = getData('orderStatus');
 
     print("nckdecjewfic${getData('token')}");
     _authController.Socket().on('test-pong', (data) {
       ToastService.show(data);
     });
     _authController.Socket().on('new-order', (data) {
-      ToastService.show("new order");
-      showBottomSheet(context, data);
       print("new order - ${data}");
+      ToastService.show("new order");
+      showOrderBottomSheet(context, data);
     });
     _authController.Socket().on('give_order_status', (data) {
-      _authController.Socket().emit('reject-user-order', {
+      _authController.Socket().emit('send_order_status', {
         "order": data,
-        "body": {"_id": "233", "lat": "0.0", "long": "0.0"}
+        "body": {
+          "_id": "${getData('employee-id')}",
+          "lat": "${_currentPosition?.latitude}",
+          "long": "${_currentPosition?.latitude}"
+        }
       });
     });
+    print("laks:${getData('employee-id')}");
   }
 
   dynamic handlePageChanged(int index, CarouselPageChangedReason reason) {
     setState(() {
       pageIndex = index;
+    });
+  }
+
+  showOrderBottomSheet(context, data) {
+    Future.delayed(Duration.zero, () {
+      showBottomSheet(context, data);
     });
   }
 
@@ -101,169 +115,193 @@ class _TaskScreenState extends State<TaskScreen> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               title: AppText(
-                text: "Arshad",
+                text: getData('user')['name'] == null
+                    ? ""
+                    : "${getData('user')['name']}",
               ),
             ),
-            body:
-                //  _authController.orderdata == null
-                //     ? SafeArea(
-                //         child: Container(
-                //             child: Center(
-                //           child:
-                //               Image.asset('assets/images/order_failed_image.png'),
-                //         )),
-                //       )
-                //     :
-                Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Card(
-                      child: Container(
-                        width: double.infinity,
-                        child: Column(
-                          children: [
-                            AppText(text: "New Order"),
-                            Container(
-                                child: Center(
-                              child: Image.asset(
-                                  'assets/images/order_failed_image.png'),
-                            )),
-                            // CircularCountDownTimer(
-                            //   duration: 60,
-                            //   initialDuration: 0,
-                            //   controller: CountDownController(),
-                            //   width: MediaQuery.of(context).size.width / 3,
-                            //   height: MediaQuery.of(context).size.height / 3,
-                            //   ringColor: Colors.grey[300]!,
-                            //   ringGradient: null,
-                            //   fillColor: colorPrimary,
-                            //   fillGradient: null,
-                            //   backgroundGradient: null,
-                            //   strokeWidth: 2.0,
-                            //   strokeCap: StrokeCap.round,
-                            //   textStyle: TextStyle(
-                            //       fontSize: 33.0,
-                            //       color: colorBlack,
-                            //       fontWeight: FontWeight.bold),
-                            //   textFormat: CountdownTextFormat.S,
-                            //   isReverse: true,
-                            //   isReverseAnimation: true,
-                            //   isTimerTextShown: true,
-                            //   autoStart: true,
-                            //   onStart: () {
-                            //     // debugPrint('Countdown Started');
-                            //   },
-                            //   onComplete: () {
-                            //     // debugPrint('Countdown Ended');
-                            //   },
-                            //   onChange: (String timeStamp) {
-                            //     // debugPrint('Countdown Changed $timeStamp');
-                            //   },
-                            // )
-                            // Container(
-                            //   decoration: BoxDecoration(
-                            //       border: Border.all(color: colorBlack),
-                            //       borderRadius:
-                            //           BorderRadius.all(Radius.circular(10000))),
-                            //   child: Image.asset(
-                            //     'assets/images/order_failed_image.png',
-                            //     fit: BoxFit.fill,
-                            //   ),
-                            // )
-
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+            body: _authController.orderdata == null
+                ? SafeArea(
+                    child: Container(
+                        child: Center(
+                      child:
+                          Image.asset('assets/images/order_failed_image.png'),
+                    )),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Card(
+                            child: Container(
+                              width: double.infinity,
+                              child: Column(
                                 children: [
-                                  Column(
-                                    children: [
-                                      AppText(text: "Total cost"),
-                                      Text("₹ 20")
-                                    ],
+                                  AppText(text: "New Order"),
+                                  Container(
+                                      child: Center(
+                                    child: Image.asset(
+                                        'assets/images/order_failed_image.png'),
+                                  )),
+                                  // CircularCountDownTimer(
+                                  //   duration: 60,
+                                  //   initialDuration: 0,
+                                  //   controller: CountDownController(),
+                                  //   width: MediaQuery.of(context).size.width / 3,
+                                  //   height: MediaQuery.of(context).size.height / 3,
+                                  //   ringColor: Colors.grey[300]!,
+                                  //   ringGradient: null,
+                                  //   fillColor: colorPrimary,
+                                  //   fillGradient: null,
+                                  //   backgroundGradient: null,
+                                  //   strokeWidth: 2.0,
+                                  //   strokeCap: StrokeCap.round,
+                                  //   textStyle: TextStyle(
+                                  //       fontSize: 33.0,
+                                  //       color: colorBlack,
+                                  //       fontWeight: FontWeight.bold),
+                                  //   textFormat: CountdownTextFormat.S,
+                                  //   isReverse: true,
+                                  //   isReverseAnimation: true,
+                                  //   isTimerTextShown: true,
+                                  //   autoStart: true,
+                                  //   onStart: () {
+                                  //     // debugPrint('Countdown Started');
+                                  //   },
+                                  //   onComplete: () {
+                                  //     // debugPrint('Countdown Ended');
+                                  //   },
+                                  //   onChange: (String timeStamp) {
+                                  //     // debugPrint('Countdown Changed $timeStamp');
+                                  //   },
+                                  // )
+                                  // Container(
+                                  //   decoration: BoxDecoration(
+                                  //       border: Border.all(color: colorBlack),
+                                  //       borderRadius:
+                                  //           BorderRadius.all(Radius.circular(10000))),
+                                  //   child: Image.asset(
+                                  //     'assets/images/order_failed_image.png',
+                                  //     fit: BoxFit.fill,
+                                  //   ),
+                                  // )
+
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          children: [
+                                            AppText(text: "Total cost"),
+                                            Text("₹ 20")
+                                          ],
+                                        ),
+                                        ElevatedButton(
+                                            onPressed: () {
+                                              _authController.orderdata.lat !=
+                                                          null &&
+                                                      _authController
+                                                              .orderdata.long !=
+                                                          null
+                                                  ? MapUtils.openMap(0.0, 0.0)
+                                                  : ToastService.show(
+                                                      "User Current Location Not Found");
+                                              ;
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                                primary: colorPrimary),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Text('Open map'),
+                                                Icon(Icons.arrow_forward)
+                                              ],
+                                            ))
+                                      ],
+                                    ),
                                   ),
-                                  ElevatedButton(
-                                      onPressed: () {},
-                                      style: ElevatedButton.styleFrom(
-                                          primary: colorPrimary),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Text('Open map'),
-                                          Icon(Icons.arrow_forward)
-                                        ],
-                                      ))
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: AppText(text: "Address:-"),
+                                      ),
+                                      Text(
+                                          "${_authController.orderdata.address}"),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: AppText(text: "Items:-"),
+                                      ),
+                                      ListView.builder(
+                                          itemCount: 3,
+                                          shrinkWrap: true,
+                                          itemBuilder: (context, i) {
+                                            return Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                Text("Tomato (2kg)"),
+                                                Text("₹ 20")
+                                              ],
+                                            );
+                                          })
+                                    ],
+                                  )
                                 ],
                               ),
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: AppText(text: "Address:-"),
-                                ),
-                                Text(
-                                    "Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres Full Addres "),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: AppText(text: "Items:-"),
-                                ),
-                                ListView.builder(
-                                    itemCount: 3,
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, i) {
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        children: [
-                                          Text("Tomato (2kg)"),
-                                          Text("₹ 20")
-                                        ],
-                                      );
-                                    })
-                              ],
-                            )
-                          ],
-                        ),
+                          ),
+                          Center(
+                              child: Stack(children: [
+                            Visibility(
+                                visible: orderStatus == "Order Picked",
+                                child: slider()),
+                            Visibility(
+                                visible: orderStatus == "Reach Destination",
+                                child: slider()),
+                            Visibility(
+                                visible: orderStatus == "Order Delivered",
+                                child: slider()),
+                          ])),
+                        ],
                       ),
                     ),
-                    Center(
-                        child: SliderButton(
-                            action: () {
-                              if (orderStatus == "Order Picked") {
-                                setState(() {
-                                  orderStatus = "Reach Destination";
-                                });
-                              } else if (orderStatus == "Reach Destination") {
-                                setState(() {
-                                  orderStatus = "Order Delivered";
-                                });
-                              } else if (orderStatus == "Order Delivered") {
-                                setState(() {
-                                  orderStatus = "Order Picked";
-                                });
-                              }
-                            },
-                            label: Text(
-                              "${orderStatus}    ",
-                              style: TextStyle(
-                                  color: Color(0xff4a4a4a),
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 17),
-                            ),
-                            icon: Icon(Icons.arrow_forward))),
-                  ],
-                ),
-              ),
-            ));
+                  ));
       }),
     );
+  }
+
+  Widget slider() {
+    return SliderButton(
+        action: () {
+          if (orderStatus == "Order Picked") {
+            setData('orderStatus', "Reach Destination");
+            // setState(() {
+            //   orderStatus = "Reach Destination";
+            // });
+          } else if (orderStatus == "Reach Destination") {
+            setData('orderStatus', "Order Delivered");
+          } else if (orderStatus == "Order Delivered") {
+            setData('orderStatus', '');
+
+            _authController.getOrder({});
+          }
+        },
+        label: Text(
+          "${orderStatus}    ",
+          style: TextStyle(
+              color: Color(0xff4a4a4a),
+              fontWeight: FontWeight.w500,
+              fontSize: 17),
+        ),
+        icon: Icon(Icons.arrow_forward));
   }
 
   listTile(String title, String subtitle) {
@@ -457,58 +495,57 @@ class _TaskScreenState extends State<TaskScreen> {
   //     ],
   //   );
   // }
+  Location location = Location();
+  LatLng _initialcameraposition = LatLng(0.5937, 0.9629);
+  getLoc() async {
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
 
-  // Location location = Location();
-  // LatLng _initialcameraposition = LatLng(0.5937, 0.9629);
-  // getLoc() async {
-  //   bool _serviceEnabled;
-  //   PermissionStatus _permissionGranted;
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
 
-  //   _serviceEnabled = await location.serviceEnabled();
-  //   if (!_serviceEnabled) {
-  //     _serviceEnabled = await location.requestService();
-  //     if (!_serviceEnabled) {
-  //       return;
-  //     }
-  //   }
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
 
-  //   _permissionGranted = await location.hasPermission();
-  //   if (_permissionGranted == PermissionStatus.denied) {
-  //     _permissionGranted = await location.requestPermission();
-  //     if (_permissionGranted != PermissionStatus.granted) {
-  //       return;
-  //     }
-  //   }
+    _currentPosition = await location.getLocation();
+    _initialcameraposition = LatLng(_currentPosition!.latitude ?? 3.13,
+        _currentPosition?.longitude ?? 36.11);
+    location.onLocationChanged.listen((LocationData currentLocation) {
+      _currentPosition = currentLocation;
+      _initialcameraposition = LatLng(_currentPosition?.latitude ?? 3.13,
+          _currentPosition?.longitude ?? 36.11);
 
-  //   _currentPosition = await location.getLocation();
-  //   _initialcameraposition = LatLng(_currentPosition!.latitude ?? 3.13,
-  //       _currentPosition?.longitude ?? 36.11);
-  //   location.onLocationChanged.listen((LocationData currentLocation) {
-  //     _currentPosition = currentLocation;
-  //     _initialcameraposition = LatLng(_currentPosition?.latitude ?? 3.13,
-  //         _currentPosition?.longitude ?? 36.11);
+      DateTime now = DateTime.now();
+      _dateTime = DateFormat('EEE d MMM kk:mm:ss ').format(now);
+      // _getAddress(_currentPosition?.latitude ?? 3.13,
+      //         _currentPosition?.longitude ?? 36.11)
+      //     .then((value) {
+      //   setState(() {
+      //     _address = "${value.first.addressLine}";
+      //   });
+      // });
+    });
+    GeoData GeoAdress = await Geocoder2.getDataFromCoordinates(
+        latitude: _currentPosition?.latitude ?? 40.714224,
+        longitude: _currentPosition?.longitude ?? -73.961452,
+        googleMapApiKey: "AIzaSyDDXLeo4ai8XyDVJxILKlNoRiE3gP7mt4s");
 
-  //     DateTime now = DateTime.now();
-  //     _dateTime = DateFormat('EEE d MMM kk:mm:ss ').format(now);
-  //     // _getAddress(_currentPosition?.latitude ?? 3.13,
-  //     //         _currentPosition?.longitude ?? 36.11)
-  //     //     .then((value) {
-  //     //   setState(() {
-  //     //     _address = "${value.first.addressLine}";
-  //     //   });
-  //     // });
-  //   });
-  //   GeoData GeoAdress = await Geocoder2.getDataFromCoordinates(
-  //       latitude: _currentPosition?.latitude ?? 40.714224,
-  //       longitude: _currentPosition?.longitude ?? -73.961452,
-  //       googleMapApiKey: "AIzaSyDDXLeo4ai8XyDVJxILKlNoRiE3gP7mt4s");
-
-  //   if (GeoAdress.address != null) {
-  //     setState(() {
-  //       geoAdress = GeoAdress;
-  //     });
-  //   }
-  // }
+    if (GeoAdress.address != null) {
+      setState(() {
+        geoAdress = GeoAdress;
+      });
+    }
+  }
 
   // String splitString(str) {
   //   var text = str.split(" ");
@@ -540,5 +577,19 @@ class _TaskScreenState extends State<TaskScreen> {
             data: data,
           );
         });
+  }
+}
+
+class MapUtils {
+  MapUtils._();
+
+  static Future<void> openMap(double lat, double long) async {
+    String googleUrl =
+        'https://www.google.com/maps/search/?api=1&query=$lat,$long';
+    if (await canLaunchUrlString(googleUrl)) {
+      await launchUrlString(googleUrl);
+    } else {
+      throw 'Could not open the map.';
+    }
   }
 }
