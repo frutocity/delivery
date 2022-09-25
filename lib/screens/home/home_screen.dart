@@ -28,6 +28,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../app/models/NewOrderResponse.dart';
 import 'grocery_featured_Item_widget.dart';
 import 'home_banner_widget.dart';
 import 'package:geocoder2/geocoder2.dart';
@@ -85,21 +86,59 @@ class _TaskScreenState extends State<TaskScreen> {
       onRefresh: () async {},
       child: GetBuilder<AuthController>(builder: (_context) {
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: AppText(
-              text: "Arshad",
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: AppText(
+                text: "Arshad",
+              ),
             ),
-          ),
-          body: SafeArea(
-            child: Container(
-                child: Center(
-              child: Image.asset('assets/images/order_failed_image.png'),
-            )),
-          ),
-        );
+            body: _authController.orderdata == null
+                ? SafeArea(
+                    child: Container(
+                        child: Center(
+                      child:
+                          Image.asset('assets/images/order_failed_image.png'),
+                    )),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        listTile("Address",
+                            '${_authController.orderdata?['order']['data']['address']}'),
+                        listTile("Phone Number",
+                            "${_authController.orderdata?['order']['data']['number']}"),
+                        listTile("Payment",
+                            "${_authController.orderdata?['order']['data']['address']}"),
+                        listTile(
+                          "Order",
+                          "${_authController.orderdata?['order']['data']['address']}",
+                        ),
+                        listTile(
+                          "Status",
+                          "${_authController.orderdata?['order']['data']['status']}",
+                        ),
+                        listTile(
+                          "Total Cost",
+                          "${_authController.orderdata?['order']['data']['status']}",
+                        )
+                      ],
+                    ),
+                  ));
       }),
+    );
+  }
+
+  listTile(String title, String subtitle) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Card(
+        child: ListTile(
+          title: Text('$title'),
+          subtitle: Text("${subtitle}"),
+        ),
+      ),
     );
   }
 

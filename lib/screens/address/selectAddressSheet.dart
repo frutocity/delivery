@@ -93,7 +93,7 @@ class _SelectAdrsSheetState extends State<SelectAdrsSheet> {
                                       : 10),
                           alignment: Alignment.centerLeft,
                           child: Text(
-                              "${a?.apartment}, ${a?.address}, ${a?.city}, ${a?.pinCode}\n(${a?.howToReach})",
+                              "${a.apartment}, ${a.address}, ${a.city}, ${a.pinCode}\n(${a.howToReach})",
                               style: TextStyle(
                                 color: colorGreyDark,
                                 fontSize: 12,
