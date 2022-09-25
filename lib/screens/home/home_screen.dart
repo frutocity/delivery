@@ -66,7 +66,7 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   void initState() {
     super.initState();
-    getLoc();
+    // getLoc();
     orderStatus = getData('orderStatus');
 
     print("nckdecjewfic${getData('token')}");
@@ -88,7 +88,7 @@ class _TaskScreenState extends State<TaskScreen> {
         }
       });
     });
-    print("laks:${getData('employee-id')}");
+    print("laksss:${_authController.orderdata}");
   }
 
   dynamic handlePageChanged(int index, CarouselPageChangedReason reason) {
@@ -117,10 +117,10 @@ class _TaskScreenState extends State<TaskScreen> {
               title: AppText(
                 text: getData('user')['name'] == null
                     ? ""
-                    : "${getData('user')['name']}",
+                    : "${getData('user')['name'] ?? ""}",
               ),
             ),
-            body: _authController.orderdata == null
+            body: _authController.orderRec == false
                 ? SafeArea(
                     child: Container(
                         child: Center(
@@ -201,10 +201,11 @@ class _TaskScreenState extends State<TaskScreen> {
                                         ),
                                         ElevatedButton(
                                             onPressed: () {
-                                              _authController.orderdata.lat !=
+                                              _authController.orderdata[
+                                                              'lat'] !=
                                                           null &&
-                                                      _authController
-                                                              .orderdata.long !=
+                                                      _authController.orderdata[
+                                                              'long'] !=
                                                           null
                                                   ? MapUtils.openMap(0.0, 0.0)
                                                   : ToastService.show(
@@ -234,7 +235,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                         child: AppText(text: "Address:-"),
                                       ),
                                       Text(
-                                          "${_authController.orderdata.address}"),
+                                          "${_authController.orderdata['address']}"),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: AppText(text: "Items:-"),
@@ -290,8 +291,7 @@ class _TaskScreenState extends State<TaskScreen> {
             setData('orderStatus', "Order Delivered");
           } else if (orderStatus == "Order Delivered") {
             setData('orderStatus', '');
-
-            _authController.getOrder({});
+            _authController.orderRec = false;
           }
         },
         label: Text(

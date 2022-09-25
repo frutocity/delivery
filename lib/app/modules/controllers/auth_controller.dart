@@ -25,7 +25,8 @@ class AuthController extends GetxController {
   List<Product> mostPopulars = <Product>[].obs;
   List<Product> productdetail = <Product>[].obs;
   IO.Socket? socket;
-  OrderResponse orderdata = OrderResponse();
+  Map<String, dynamic> orderdata = {};
+  var orderRec = false;
 
   @override
   void onInit() {
@@ -82,6 +83,7 @@ class AuthController extends GetxController {
   void getOrder(data) {
     if (data != null) {
       orderdata = data;
+      orderRec = true;
     }
 
     update();
