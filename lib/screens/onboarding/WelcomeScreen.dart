@@ -187,7 +187,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       shape: ShapeBorder.lerp(r, c, 0.1),
       buttonColor: colorPrimary,
       colorScheme: ColorScheme.dark(),
-      child: RaisedButton(
+      child: ElevatedButton(
         onPressed: () {
           _carouselController.nextPage(
               duration: Duration(milliseconds: 300), curve: Curves.linear);

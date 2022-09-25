@@ -187,7 +187,7 @@ class _ProfileSettingState extends State<ProfileSetting> {
             alignment: Alignment.center,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [logoutButton()],
+              children: [Container()],
             ),
           ),
         ),
@@ -195,48 +195,48 @@ class _ProfileSettingState extends State<ProfileSetting> {
     );
   }
 
-  Widget logoutButton() {
-    return Container(
-      width: double.maxFinite,
-      margin: EdgeInsets.symmetric(horizontal: 25),
-      child: RaisedButton(
-        visualDensity: VisualDensity.compact,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18.0),
-        ),
-        color: Color(0xffF2F3F2),
-        textColor: Colors.white,
-        elevation: 0.0,
-        padding: EdgeInsets.symmetric(vertical: 24, horizontal: 25),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: SvgPicture.asset(
-                "assets/icons/account_icons/logout_icon.svg",
-              ),
-            ),
-            Text(
-              "Log Out",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor),
-            ),
-            Container()
-          ],
-        ),
-        onPressed: () {
-          setData("user", null);
-          setData("token", null);
-          Get.offNamed(Routes.WELCOME);
-        },
-      ),
-    );
-  }
+  // Widget logoutButton() {
+  //   return Container(
+  //     width: double.maxFinite,
+  //     margin: EdgeInsets.symmetric(horizontal: 25),
+  //     child: RaisedButton(
+  //       visualDensity: VisualDensity.compact,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(18.0),
+  //       ),
+  //       color: Color(0xffF2F3F2),
+  //       textColor: Colors.white,
+  //       elevation: 0.0,
+  //       padding: EdgeInsets.symmetric(vertical: 24, horizontal: 25),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           SizedBox(
+  //             width: 20,
+  //             height: 20,
+  //             child: SvgPicture.asset(
+  //               "assets/icons/account_icons/logout_icon.svg",
+  //             ),
+  //           ),
+  //           Text(
+  //             "Log Out",
+  //             textAlign: TextAlign.center,
+  //             style: TextStyle(
+  //                 fontSize: 18,
+  //                 fontWeight: FontWeight.bold,
+  //                 color: AppColors.primaryColor),
+  //           ),
+  //           Container()
+  //         ],
+  //       ),
+  //       onPressed: () {
+  //         setData("user", null);
+  //         setData("token", null);
+  //         Get.offNamed(Routes.WELCOME);
+  //       },
+  //     ),
+  //   );
+  // }
 
   Size screenSize(BuildContext context) {
     return MediaQuery.of(context).size;

@@ -70,25 +70,39 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Expanded(
-                      child: RaisedButton(
-                    onPressed: () {},
+                      child: ElevatedButton(
+                    onPressed: () {
+                      _authController.Socket().emit('reject-user-order', {
+                        "order": widget.data,
+                        "body": {"_id": "233"}
+                      });
+                    },
                     child: Text("Reject"),
-                    color: Colors.red,
-                    textColor: Colors.white,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                        )),
                   )),
                   SizedBox(width: 18),
                   Expanded(
-                      child: RaisedButton(
+                      child: ElevatedButton(
                     onPressed: () {
                       _authController.Socket()
                           .emit('join-user-order', widget.data);
                       _authController.getOrder(widget.data);
-                      MapUtils.openMap(
-                          double.parse("70.12546"), double.parse("72.12546"));
+                      _authController.Socket().emit('accept-user-order', {
+                        "order": widget.data,
+                        "body": {"_id": "233"}
+                      });
+                      Get.back();
                     },
                     child: Text("Accept"),
-                    color: Colors.green,
-                    textColor: Colors.white,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                        )),
                   )),
                 ],
               ),

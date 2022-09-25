@@ -59,10 +59,11 @@ class _AccountScreenState extends State<AccountScreen> {
                 SizedBox(
                   height: 5,
                 ),
-                BottomSheet(builder: (BuildContext context) { 
-                  return logoutButton();
-                 },
-                onClosing: () {  },
+                BottomSheet(
+                  builder: (BuildContext context) {
+                    return Container();
+                  },
+                  onClosing: () {},
                 ),
                 SizedBox(
                   height: 20,
@@ -75,56 +76,58 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget logoutButton() {
-    return Container(
-      width: double.maxFinite,
-      margin: EdgeInsets.symmetric(horizontal: 25),
-      child: RaisedButton(
-        visualDensity: VisualDensity.compact,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18.0),
-        ),
-        color: Color(0xffF2F3F2),
-        textColor: Colors.white,
-        elevation: 0.0,
-        padding: EdgeInsets.symmetric(vertical: 24, horizontal: 25),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: SvgPicture.asset(
-                "assets/icons/account_icons/logout_icon.svg",
-              ),
-            ),
-            Text(
-              "Log Out",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor),
-            ),
-            Container()
-          ],
-        ),
-        onPressed: () {
-          setData("user", null);
-          setData("token", null);
-          _authController.socket?.disconnect();
-          print("socket disconnect${_authController.socket}");
-          Get.offNamed(Routes.WELCOME);
-        },
-      ),
-    );
-  }
+  // Widget logoutButton() {
+  //   return Container(
+  //     width: double.maxFinite,
+  //     margin: EdgeInsets.symmetric(horizontal: 25),
+  //     child: RaisedButton(
+  //       visualDensity: VisualDensity.compact,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(18.0),
+  //       ),
+  //       color: Color(0xffF2F3F2),
+  //       textColor: Colors.white,
+  //       elevation: 0.0,
+  //       padding: EdgeInsets.symmetric(vertical: 24, horizontal: 25),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           SizedBox(
+  //             width: 20,
+  //             height: 20,
+  //             child: SvgPicture.asset(
+  //               "assets/icons/account_icons/logout_icon.svg",
+  //             ),
+  //           ),
+  //           Text(
+  //             "Log Out",
+  //             textAlign: TextAlign.center,
+  //             style: TextStyle(
+  //                 fontSize: 18,
+  //                 fontWeight: FontWeight.bold,
+  //                 color: AppColors.primaryColor),
+  //           ),
+  //           Container()
+  //         ],
+  //       ),
+  //       onPressed: () {
+  //         setData("user", null);
+  //         setData("token", null);
+  //         _authController.socket?.disconnect();
+  //         print("socket disconnect${_authController.socket}");
+  //         Get.offNamed(Routes.WELCOME);
+  //       },
+  //     ),
+  //   );
+  // }
 
   Widget getImageHeader() {
     String imagePath = no_user_image;
     return CircleAvatar(
       radius: 50.0,
-      backgroundImage: AssetImage(imagePath, ),
+      backgroundImage: AssetImage(
+        imagePath,
+      ),
       backgroundColor: AppColors.primaryColor.withOpacity(0.7),
     );
   }

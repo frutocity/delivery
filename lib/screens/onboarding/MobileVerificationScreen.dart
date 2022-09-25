@@ -139,7 +139,7 @@ class _MobileVerificationState extends State<MobileVerification> {
             shape: ShapeBorder.lerp(r, c, 0.1),
             buttonColor: colorPrimary,
             colorScheme: ColorScheme.dark(),
-            child: RaisedButton(
+            child: ElevatedButton(
               onPressed: _authController.isOtpSent
                   ? () {
                       if (otpList.length == 0) {
