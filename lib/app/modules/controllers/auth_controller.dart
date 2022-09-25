@@ -25,7 +25,7 @@ class AuthController extends GetxController {
   List<Product> mostPopulars = <Product>[].obs;
   List<Product> productdetail = <Product>[].obs;
   IO.Socket? socket;
-  Map<String, dynamic>? orderdata;
+  OrderResponse orderdata = OrderResponse();
 
   @override
   void onInit() {
@@ -62,7 +62,7 @@ class AuthController extends GetxController {
           isVerified = true;
 
           setData("user", data.data);
-          setData("user-id", data.data.id.toString());
+          setData("employee-id", data.data.id.toString());
 
           setData("token", data.data.token);
           print("verify data success");

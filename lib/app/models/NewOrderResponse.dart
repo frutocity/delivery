@@ -1,95 +1,85 @@
-// To parse this JSON data, do
-//
-//     final NewOrderReponse = NewOrderReponseFromJson(jsonString);
+class OrderResponse {
+  String? sId;
+  String? user;
+  int? number;
+  List<Items>? items;
+  String? status;
+  String? address;
+  String? createdAt;
+  String? updatedAt;
+  int? iV;
+  double? lat;
+  double? long;
 
-import 'package:app/app/models/ProductList.dart';
-import 'package:meta/meta.dart';
-import 'dart:convert';
+  OrderResponse(
+      {this.sId,
+      this.user,
+      this.number,
+      this.items,
+      this.status,
+      this.address,
+      this.createdAt,
+      this.updatedAt,
+      this.iV,
+      this.lat,
+      this.long});
 
-NewOrderReponse NewOrderReponseFromJson(String str) =>
-    NewOrderReponse.fromJson(json.decode(str));
+  OrderResponse.fromJson(Map<String, dynamic> json) {
+    sId = json['_id'];
+    user = json['user'];
+    number = json['number'];
+    if (json['items'] != null) {
+      items = <Items>[];
+      json['items'].forEach((v) {
+        items!.add(new Items.fromJson(v));
+      });
+    }
+    status = json['status'];
+    address = json['address'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+    iV = json['__v'];
+    lat = json['lat'];
+    long = json['long'];
+  }
 
-class NewOrderReponse {
-  NewOrderReponse({
-    required this.order,
-  });
-
-  final Order order;
-
-  factory NewOrderReponse.fromJson(Map<String, dynamic> json) =>
-      NewOrderReponse(
-        order: json["order"],
-      );
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['_id'] = this.sId;
+    data['user'] = this.user;
+    data['number'] = this.number;
+    if (this.items != null) {
+      data['items'] = this.items!.map((v) => v.toJson()).toList();
+    }
+    data['status'] = this.status;
+    data['address'] = this.address;
+    data['createdAt'] = this.createdAt;
+    data['updatedAt'] = this.updatedAt;
+    data['__v'] = this.iV;
+    data['lat'] = this.lat;
+    data['long'] = this.long;
+    return data;
+  }
 }
 
-class Order {
-  Order({
-    required this.status,
-    required this.message,
-    required this.data,
-  });
+class Items {
+  String? product;
+  int? quantity;
+  String? sId;
 
-  bool status;
-  String message;
-  Data data;
+  Items({this.product, this.quantity, this.sId});
 
-  factory Order.fromJson(Map<String, dynamic> json) => Order(
-        status: json["status"],
-        message: json["message"],
-        data: json["data"],
-      );
+  Items.fromJson(Map<String, dynamic> json) {
+    product = json['product'];
+    quantity = json['quantity'];
+    sId = json['_id'];
+  }
 
-  Map<String, dynamic> toJson() => {
-        "status": status,
-        "message": message,
-        "data": data,
-      };
-}
-
-class Data {
-  String user;
-  int number;
-  List<dynamic> items;
-  String status;
-  String address;
-  String id;
-  String createdAt;
-  String updatedAt;
-  int v;
-
-  Data({
-    required this.user,
-    required this.number,
-    required this.items,
-    required this.status,
-    required this.address,
-    required this.id,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
-  });
-
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-        user: json["user"],
-        number: json["number"],
-        items: json["items"],
-        status: json["status"],
-        address: json["address"],
-        id: json["_id"],
-        createdAt: json["createdAt"],
-        updatedAt: json["updatedAt"],
-        v: json["_v"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "user": user,
-        "number": number,
-        "items": items,
-        "status": status,
-        "address": address,
-        "_id": id,
-        "createdAt": createdAt,
-        "updatedAt": updatedAt,
-        "_v": v,
-      };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['product'] = this.product;
+    data['quantity'] = this.quantity;
+    data['_id'] = this.sId;
+    return data;
+  }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
+import '../../app/helpers/storage.dart';
 import 'navigator_item.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -16,6 +17,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   DateTime timeBackPressed = DateTime.now();
 
   final StateController state = Get.put(StateController());
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setData('orderStatus', "O");
+  }
 
   @override
   Widget build(BuildContext context) {

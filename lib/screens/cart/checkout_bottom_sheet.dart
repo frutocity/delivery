@@ -1,6 +1,7 @@
 import 'package:app/app/common_widgets/app_button.dart';
 import 'package:app/app/common_widgets/app_text.dart';
 import 'package:app/app/common_widgets/order_failed_dialog.dart';
+import 'package:app/app/helpers/storage.dart';
 import 'package:app/app/helpers/string.dart';
 import 'package:app/app/modules/controllers/addAdddress_controller.dart';
 import 'package:app/app/modules/controllers/auth_controller.dart';
@@ -74,7 +75,7 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                     onPressed: () {
                       _authController.Socket().emit('reject-user-order', {
                         "order": widget.data,
-                        "body": {"_id": "233"}
+                        "body": {"_id": "${getData('employee-id')}"}
                       });
                     },
                     child: Text("Reject"),
@@ -88,12 +89,14 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                   Expanded(
                       child: ElevatedButton(
                     onPressed: () {
+                      setData('orderStatus', "Order Picked");
+
                       _authController.Socket()
                           .emit('join-user-order', widget.data);
                       _authController.getOrder(widget.data);
                       _authController.Socket().emit('accept-user-order', {
                         "order": widget.data,
-                        "body": {"_id": "233"}
+                        "body": {"_id": "${getData('employee-id')}"}
                       });
                       Get.back();
                     },
@@ -213,19 +216,5 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
         builder: (BuildContext bc) {
           return SelectAdrsSheet();
         });
-  }
-}
-
-class MapUtils {
-  MapUtils._();
-
-  static Future<void> openMap(double lat, double long) async {
-    String googleUrl =
-        'https://www.google.com/maps/search/?api=1&query=$lat,$long';
-    if (await canLaunchUrlString(googleUrl)) {
-      await launchUrlString(googleUrl);
-    } else {
-      throw 'Could not open the map.';
-    }
   }
 }
