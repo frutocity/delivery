@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:app/app/common_widgets/ProductCard.dart';
 import 'package:app/app/common_widgets/app_button.dart';
 import 'package:app/app/common_widgets/app_text.dart';
@@ -7,6 +9,7 @@ import 'package:app/app/common_widgets/shimmerEffect.dart';
 import 'package:app/app/common_widgets/slider.dart';
 import 'package:app/app/data/app_utils.dart';
 import 'package:app/app/helpers/storage.dart';
+import 'package:app/app/helpers/string.dart';
 import 'package:app/app/helpers/toast_service.dart';
 import 'package:app/app/models/ProductList.dart';
 import 'package:app/app/models/grocery_item.dart';
@@ -44,7 +47,8 @@ class TaskScreen extends StatefulWidget {
   State<TaskScreen> createState() => _TaskScreenState();
 }
 
-class _TaskScreenState extends State<TaskScreen> {
+class _TaskScreenState extends State<TaskScreen>
+    with SingleTickerProviderStateMixin {
   final List carouselList = [
     Slides("E Shopping", "Explore top organic fruits & grab them",
         "assets/images/banner_image.png", 1),
@@ -53,6 +57,8 @@ class _TaskScreenState extends State<TaskScreen> {
     Slides("Delivery Arrived", "Order is arrived at your Place",
         "assets/images/banner_image.png", 1)
   ];
+  late final AnimationController _controller;
+
   LocationData? _currentPosition;
   String? _address, _dateTime;
   int pageIndex = 0;
@@ -66,8 +72,20 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   void initState() {
     super.initState();
+    // setData("temp-order", null);
+    _controller = AnimationController(
+      vsync: this,
+    );
+    _startAnimation();
     // getLoc();
     orderStatus = getData('orderStatus');
+
+    print("_authController.orderdata ${_authController.orderdata}");
+
+    if (_authController.orderRec) {
+      _authController.Socket()
+          .emit('join-user-order', _authController.orderdata);
+    }
 
     print("nckdecjewfic${getData('token')}");
     _authController.Socket().on('test-pong', (data) {
@@ -103,10 +121,90 @@ class _TaskScreenState extends State<TaskScreen> {
     });
   }
 
+  void _startAnimation() {
+    _controller
+      ..stop()
+      ..reset()
+      ..repeat(period: const Duration(milliseconds: 1200));
+  }
+
+  String btn_text(status) {
+    print("btn_text: " + status);
+    switch (status) {
+      case "PROCESSING":
+        return "Order picked up";
+      case "READY":
+        return "Reached at Destination";
+      case "DISPATCHED":
+        return "delivered";
+      default:
+        return "";
+    }
+  }
+
+  String box_text(status) {
+    print("btn_text: " + status);
+    switch (status) {
+      case "PROCESSING":
+        return "Order Accepted";
+      case "READY":
+        return "Order Picked up";
+      case "DISPATCHED":
+        return "Reached at Destination";
+      default:
+        return "";
+    }
+  }
+
+  void handle_btn_click(status) {
+    switch (status) {
+      case "PROCESSING":
+        return order_pickup();
+      case "READY":
+        return reached_destination();
+      case "DISPATCHED":
+        return delivered();
+      default:
+        break;
+    }
+  }
+
+  void reject_order() {
+    // api.socket((s) => {
+    // 	s.emit("reject-user-order", {
+    // 		order: temp,
+    // 		boy: user,
+    // 	});
+
+    _authController.Socket().emit("reject-user-order",
+        {..._authController.orderdata, "boy": getData("user")});
+  }
+
+  void order_pickup() {
+    _authController.Socket().emit("out-for-delivery",
+        {..._authController.orderdata, "boy": getData("user")});
+    _authController.updateOrderStatus("READY");
+  }
+
+  void reached_destination() {
+    _authController.Socket().emit("reached-at-destination",
+        {..._authController.orderdata, "boy": getData("user")});
+    _authController.updateOrderStatus("DISPATCHED");
+  }
+
+  void delivered() {
+    _authController.Socket().emit(
+        "delivered", {..._authController.orderdata, "boy": getData("user")});
+    _authController.updateOrderStatus("DELIVERED");
+    _authController.deleteOrder();
+  }
+
   GeoData? geoAdress;
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
     return RefreshIndicator(
       onRefresh: () async {},
       child: GetBuilder<AuthController>(builder: (_context) {
@@ -139,11 +237,175 @@ class _TaskScreenState extends State<TaskScreen> {
                               child: Column(
                                 children: [
                                   AppText(text: "New Order"),
+                                  Padding(
+                                    padding: const EdgeInsets.all(18.0),
+                                    child: Container(
+                                      height: 100.0,
+                                      width: width,
+                                      padding: EdgeInsets.all(10.0),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.shade500,
+                                            offset: Offset(1.0, -3.0),
+                                            blurRadius: 1.0,
+                                            spreadRadius: 3.0,
+                                          ),
+                                          BoxShadow(
+                                            color: Colors.grey.shade500,
+                                            offset: Offset(-1.0, 1.0),
+                                            blurRadius: 1.0,
+                                            spreadRadius: 1.9,
+                                          ),
+                                          BoxShadow(
+                                            color: Colors.white,
+                                            offset: Offset(-1.0, -5.0),
+                                            blurRadius: 2.0,
+                                            spreadRadius: 1.0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: CustomPaint(
+                                              painter:
+                                                  SpritePainter(_controller),
+                                              child: SizedBox(
+                                                width: 40.0,
+                                                height: 40.0,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  box_text(_authController
+                                                          .orderdata['order']
+                                                      ['status']),
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontFamily: "Gilroy",
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Notify the customer by clicking below button",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: colorGrey,
+                                                    fontFamily: "Gilroy",
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  AppButton(
+                                      label: btn_text(_authController
+                                          .orderdata['order']['status']),
+                                      onPressed: () {
+                                        handle_btn_click(_authController
+                                            .orderdata['order']['status']);
+                                      }),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
                                   Container(
-                                      child: Center(
-                                    child: Image.asset(
-                                        'assets/images/order_failed_image.png'),
-                                  )),
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    height: 100,
+                                    margin: EdgeInsets.only(bottom: 10),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: colorGreyExtraLight,
+                                            width: 2),
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        10, 10, 10, 10),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${_authController.orderdata['order']['address']['address']}",
+                                          style: TextStyle(
+                                            // fontFamily: 'Poppins',
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          "${_authController.orderdata['order']['address']['apartment']}, ${_authController.orderdata['order']['address']['pin_code']} (${_authController.orderdata['order']['address']['how_to_reach']})",
+                                          style: TextStyle(
+                                            // fontFamily: 'Poppins',
+                                            color: colorGreyDark,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  ...[
+                                    ..._authController.orderdata['order']
+                                        ['items']
+                                  ].map(((e) {
+                                    print("item elements map data : $e");
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 20),
+                                      child: IntrinsicHeight(
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "${e['quantity']}x",
+                                                  style: TextStyle(
+                                                    color: colorPrimary,
+                                                    fontSize: 20,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Text(
+                                                  "${e['product']['name']}",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Text(
+                                              "$rupees ${e['product']['price']}",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  })).toList(),
+
                                   // CircularCountDownTimer(
                                   //   duration: 60,
                                   //   initialDuration: 0,
@@ -194,6 +456,10 @@ class _TaskScreenState extends State<TaskScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             AppText(text: "Total cost"),
                                             Text("₹ 20")
@@ -226,35 +492,6 @@ class _TaskScreenState extends State<TaskScreen> {
                                       ],
                                     ),
                                   ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: AppText(text: "Address:-"),
-                                      ),
-                                      Text(
-                                          "${_authController.orderdata['address']}"),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: AppText(text: "Items:-"),
-                                      ),
-                                      ListView.builder(
-                                          itemCount: 3,
-                                          shrinkWrap: true,
-                                          itemBuilder: (context, i) {
-                                            return Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
-                                              children: [
-                                                Text("Tomato (2kg)"),
-                                                Text("₹ 20")
-                                              ],
-                                            );
-                                          })
-                                    ],
-                                  )
                                 ],
                               ),
                             ),
@@ -591,5 +828,37 @@ class MapUtils {
     } else {
       throw 'Could not open the map.';
     }
+  }
+}
+
+class SpritePainter extends CustomPainter {
+  final Animation<double> _animation;
+
+  SpritePainter(this._animation) : super(repaint: _animation);
+
+  void circle(Canvas canvas, Rect rect, double value) {
+    double opacity = (1.0 - (value / 4.0)).clamp(0.0, 1.0);
+    Color color = Colors.green.withOpacity(opacity);
+
+    double size = rect.width / 1.5;
+    double area = size * size;
+    double radius = sqrt(area * value / 4);
+
+    final Paint paint = Paint()..color = color;
+    canvas.drawCircle(rect.center, radius, paint);
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Rect rect = Rect.fromLTRB(0.0, 0.0, size.width, size.height);
+
+    for (int wave = 3; wave >= 0; wave--) {
+      circle(canvas, rect, wave + _animation.value);
+    }
+  }
+
+  @override
+  bool shouldRepaint(SpritePainter oldDelegate) {
+    return true;
   }
 }

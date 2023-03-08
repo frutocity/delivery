@@ -1,1 +1,1 @@
-const base_url = "https://api.frutocity.com/";
+const base_url = "https://api.frutocity.cf/";

@@ -25,8 +25,8 @@ class AuthController extends GetxController {
   List<Product> mostPopulars = <Product>[].obs;
   List<Product> productdetail = <Product>[].obs;
   IO.Socket? socket;
-  Map<String, dynamic> orderdata = {};
-  var orderRec = false;
+  Map<String, dynamic> orderdata = getData("temp-order") ?? {};
+  var orderRec = getData("temp-order") != null ? true : false;
 
   @override
   void onInit() {
@@ -63,6 +63,7 @@ class AuthController extends GetxController {
           isVerified = true;
 
           setData("user", data.data);
+
           setData("employee-id", data.data.id.toString());
 
           setData("token", data.data.token);
@@ -89,6 +90,26 @@ class AuthController extends GetxController {
     update();
   }
 
+  void deleteOrder() {
+    orderdata = {};
+    orderRec = false;
+
+    setData("temp-order", null);
+
+    update();
+  }
+
+  void updateOrderStatus(status) {
+    orderdata = {
+      ...orderdata,
+      "order": {...orderdata['order'], "status": status}
+    };
+    //
+    setData("temp-order", orderdata);
+
+    update();
+  }
+
   void bannerList() {
     banners = [];
     // ToastService.show("data.message");
@@ -111,14 +132,14 @@ class AuthController extends GetxController {
     if (socket != null) {
       return socket!;
     }
-    socket = IO.io('https://socket.frutocity.com/', <String, dynamic>{
+    socket = IO.io('https://socket.frutocity.cf/', <String, dynamic>{
       'transports': ['websocket'],
       'extraHeaders': {'foo': 'bar'}
     });
     socket?.connect();
     socket?.onConnect((_) {
       print('connect');
-      socket?.emit('set-user', {"id": getData('user-id').toString()});
+      socket?.emit('set-user', {"id": getData('employee-id').toString()});
     });
     update();
     return socket!;

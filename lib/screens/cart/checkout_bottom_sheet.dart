@@ -90,13 +90,14 @@ class _CheckoutBottomSheetState extends State<CheckoutBottomSheet> {
                       child: ElevatedButton(
                     onPressed: () {
                       setData('orderStatus', "Order Picked");
-
+                      setData("temp-order", widget.data);
                       _authController.Socket()
                           .emit('join-user-order', widget.data);
                       _authController.getOrder(widget.data);
+                      _authController.updateOrderStatus("PROCESSING");
                       _authController.Socket().emit('accept-user-order', {
-                        "order": widget.data,
-                        "body": {"_id": "${getData('employee-id')}"}
+                        "order": widget.data['order'],
+                        "boy": {"_id": "${getData('employee-id')}"}
                       });
                       Get.back();
                     },
